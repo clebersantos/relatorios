@@ -1,5 +1,6 @@
 <template>
   <v-app>
+    <r-sidebar></r-sidebar>
     <v-toolbar app>
       <v-toolbar-title class="headline text-uppercase">
         <span>GITHUB</span>
@@ -7,85 +8,24 @@
       </v-toolbar-title>
       <v-spacer></v-spacer>
     </v-toolbar>
-
     <v-content>
-      <v-container fluid grid-list-xl>
-        <v-layout wrap align-center>
-          <v-flex xs12 sm6 d-flex>
-            <v-select
-                v-model="repoSelected"
-                :hint="`${repoSelected.full_name} <br><br> ${repoSelected.description}`"
-                :items="repos"
-                item-text="name"
-                item-value="full_name"
-                label="Repositório"
-                outline
-                persistent-hint
-                return-object
-                single-line
-            ></v-select>
-          </v-flex>
-          <v-flex xs12 sm6 d-flex>
-            <v-select
-                    v-model="actionSelected"
-                    :hint="`${actionSelected.full_name} <br><br> ${actionSelected.description}`"
-                    :items="actions"
-                    item-text="label"
-                    item-value="slug"
-                    label="Tipo dos dados"
-                    outline
-                    persistent-hint
-                    return-object
-                    single-line
-            ></v-select>
-          </v-flex>
-        </v-layout>
+      <v-container fluid>
+        <router-view></router-view>
       </v-container>
-
-      <v-data-table
-          :headers="headers"
-          :items="desserts"
-          class="elevation-1"
-          :rows-per-page-items="[-1]"
-          disable-initial-sort
-        >
-          <template v-slot:items="props">
-            <td>{{ props.item.name }}</td>
-            <!--<td class="text-xs-left">{{ props.item.created_at }}</td>-->
-            <td class="text-xs-justify">{{ props.item.body }}</td>
-          </template>
-        </v-data-table>
-
-      <div class="text-xs-center">
-            <div class="mt-2">
-              Páginação da API
-            </div>
-        <v-container>
-          <v-layout justify-center>
-            <v-flex xs8>
-              <v-card>
-                <v-card-text>
-                  <v-pagination
-                          v-model="page"
-                          :length="paginationLength"
-                  ></v-pagination>
-                </v-card-text>
-              </v-card>
-            </v-flex>
-          </v-layout>
-        </v-container>
-      </div>
     </v-content>
+    <v-footer app></v-footer>
   </v-app>
 </template>
 
 <script>
 import HelloWorld from './components/HelloWorld'
 import axios from 'axios';
+import RSidebar from "./components/Sidebar";
 
 export default {
   name: 'App',
   components: {
+      RSidebar,
     HelloWorld
   },
   mounted() {
