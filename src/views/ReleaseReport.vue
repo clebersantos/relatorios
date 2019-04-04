@@ -16,12 +16,26 @@
                   single-line
           ></v-select>
         </v-flex>
+        <v-flex xs12 sm6 d-flex>
+          <v-select
+                  v-model="releaseSelected"
+                  :hint="`${releaseSelected.start_date}/${releaseSelected.desired_end_date} <br><br> ${releaseSelected.description}`"
+                  :items="releases"
+                  item-text="title"
+                  item-value="release_id"
+                  label="Release Report"
+                  outline
+                  persistent-hint
+                  return-object
+                  single-line
+          ></v-select>
+        </v-flex>
       </v-layout>
     </v-container>
-
+    {{issues}}
     <v-data-table
             :headers="headers"
-            :items="desserts"
+            :items="issues"
             class="elevation-1"
             :rows-per-page-items="[-1]"
             disable-initial-sort
@@ -55,15 +69,25 @@
   </div>
 </template>
 
-
 <script>
     import axios from 'axios';
 
+    const instanceZenHub = axios.create({
+        baseURL: 'https://api.zenhub.io',
+        timeout: 1000,
+        headers: {'X-Authentication-Token': 'PREENCHER COM O TOKEN DO ZENHUB'}
+    });
+
+    const instanceGitHub = axios.create({
+        baseURL: 'https://api.github.com',
+        timeout: 1000,
+    });
+
     export default {
-        name: 'Release',
+        name: 'ReleaseReport',
         mounted() {
-            axios
-                .get('https://api.github.com/users/culturagovbr/repos?sort=updated')
+            instanceGitHub
+                .get('/users/culturagovbr/repos?sort=updated')
                 .then(response => (this.repos = response.data))
         },
         data () {
@@ -79,8 +103,11 @@
                     { text: 'Conteudo', value: 'body' },
                 ],
                 desserts: [],
+                issues: [],
                 repos: [],
+                releases: [],
                 repoSelected: {},
+                releaseSelected: {},
                 actions: [
                     {
                         name: 'releases',
@@ -100,7 +127,12 @@
         },
         watch: {
             repoSelected() {
-                this.buscar();
+                // this.buscar();
+                this.buscarRelease();
+            },
+            releaseSelected() {
+                // this.buscar();
+                this.buscarIssuesRelease();
             },
             page() {
                 this.buscar();
@@ -109,9 +141,23 @@
         methods: {
             buscar() {
                 if (Object.keys(this.repoSelected).length > 0)   {
-                    axios
-                        .get(`https://api.github.com/repos/culturagovbr/${this.repoSelected.name}/releases?page=${this.page}`)
+                    instanceGitHub
+                        .get(`/repos/culturagovbr/${this.repoSelected.name}/releases?page=${this.page}`)
                         .then(response => (this.desserts = response.data))
+                }
+            },
+            buscarRelease() {
+                if (Object.keys(this.repoSelected).length > 0)   {
+                    instanceZenHub
+                        .get(`/p1/repositories/${this.repoSelected.id}/reports/releases`)
+                        .then(response => (this.releases = response.data))
+                }
+            },
+            buscarIssuesRelease() {
+                if (Object.keys(this.releaseSelected).length > 0)   {
+                    instanceZenHub
+                        .get(`/p1/reports/release/${this.releaseSelected.release_id}/issues`)
+                        .then(response => (this.issues = response.data))
                 }
             }
         }

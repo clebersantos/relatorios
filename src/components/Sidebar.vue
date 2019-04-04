@@ -98,6 +98,7 @@
                 items: [
                     { icon: 'dashboard', text: 'Dashboard', route: 'dashboard' },
                     { icon: 'loyalty', text: 'Release', route: 'release'},
+                    { icon: 'loyalty', text: 'Release Reports', route: 'release-report'},
                     // { icon: 'content_copy', text: 'Duplicates' },
                     // {
                     //     icon: 'keyboard_arrow_up',
